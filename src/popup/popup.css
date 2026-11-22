@@ -1,0 +1,8 @@
+:root { --bg: #fbfaf7; --fg: #23211d; --accent: #8a5a2b; --muted: #77716a; color-scheme: light; }
+@media (prefers-color-scheme: dark) { :root { --bg: #1d1c1a; --fg: #ece8e1; --accent: #d09a62; --muted: #a39d94; color-scheme: dark; } }
+body { margin: 0; padding: 14px; width: 260px; background: var(--bg); color: var(--fg); font: 13px/1.4 system-ui, sans-serif; display: grid; gap: 8px; }
+header { display: flex; align-items: baseline; justify-content: space-between; }
+h1 { margin: 0; font-size: 16px; letter-spacing: .02em; }
+#count, #status { color: var(--muted); font-size: 12px; margin: 0; }
+button { padding: 8px 10px; border: 1px solid var(--accent); border-radius: 6px; background: transparent; color: var(--fg); text-align: left; cursor: pointer; }
+button:hover { background: color-mix(in srgb, var(--accent) 14%, transparent); }
