@@ -1,0 +1,31 @@
+:root { --bg: #fbfaf7; --fg: #23211d; --accent: #8a5a2b; --muted: #77716a; --line: #e3ded6; --field: #fff; color-scheme: light; }
+@media (prefers-color-scheme: dark) {
+  :root { --bg: #1d1c1a; --fg: #ece8e1; --accent: #d09a62; --muted: #a39d94; --line: #37342f; --field: #262421; color-scheme: dark; }
+}
+body { margin: 0; background: var(--bg); color: var(--fg); font: 14px/1.5 system-ui, sans-serif; }
+main { max-width: 760px; margin: 0 auto; padding: 24px 16px 64px; }
+h1 { font-size: 22px; margin: 0 0 8px; }
+h2 { font-size: 16px; margin: 0 0 10px; }
+section { border-top: 1px solid var(--line); padding: 18px 0; }
+.row { display: flex; gap: 8px; align-items: center; margin: 4px 0; }
+.hint { color: var(--muted); font-size: 12px; margin: 8px 0; }
+code { font-size: 12px; }
+input, select, textarea { font: inherit; color: var(--fg); background: var(--field); border: 1px solid var(--line); border-radius: 6px; padding: 6px 8px; box-sizing: border-box; }
+textarea { width: 100%; resize: vertical; }
+.grid { display: grid; grid-template-columns: 140px 1fr; gap: 8px 12px; align-items: center; }
+.grid textarea { grid-column: 2; }
+.actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 10px; }
+button { font: inherit; padding: 6px 12px; border: 1px solid var(--accent); border-radius: 6px; background: transparent; color: var(--fg); cursor: pointer; }
+button:hover { background: color-mix(in srgb, var(--accent) 14%, transparent); }
+button.primary { background: var(--accent); color: var(--bg); }
+button:disabled { opacity: .5; cursor: progress; }
+.status { color: var(--muted); font-size: 12px; }
+.status.error { color: #c0392b; }
+.group { border: 1px solid var(--line); border-radius: 8px; padding: 10px; margin: 10px 0; display: grid; gap: 6px; }
+.groupHead { display: flex; gap: 8px; align-items: center; }
+.groupHead .name { flex: 1; min-width: 0; font-weight: 600; }
+.swatch { width: 12px; height: 12px; border-radius: 50%; flex: none; }
+#learned { padding-left: 18px; margin: 6px 0; }
+#learned li { margin: 2px 0; }
+#learned button { padding: 0 6px; font-size: 12px; margin-left: 6px; }
+@media (max-width: 560px) { .grid { grid-template-columns: 1fr; } .grid textarea { grid-column: 1; } }

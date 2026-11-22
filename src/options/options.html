@@ -1,8 +1,87 @@
 <!doctype html>
-<html>
-<head><meta charset="utf-8"><title>Tabmason options</title></head>
-<body style="font: 14px system-ui, sans-serif; padding: 16px;">
-  <h1>Tabmason</h1>
-  <p>Options will live here.</p>
+<html lang="zh">
+<head>
+  <meta charset="utf-8">
+  <title>Tabmason 设置</title>
+  <link rel="stylesheet" href="options.css">
+</head>
+<body>
+  <main>
+    <h1>Tabmason</h1>
+
+    <section>
+      <h2>自动归类</h2>
+      <label class="row"><input type="checkbox" id="enabled"> 新开或刷新的标签页自动放进我的分组</label>
+      <label class="row"><input type="checkbox" id="regroupOnRefresh"> 已在组里的标签页刷新时也重新判断（默认不动）</label>
+      <p class="hint">判断顺序：你手动拖拽学到的规则 → 分组规则 → 之前 AI 的判断缓存 → AI。AI 只会从下面的分组里选，判断不了就不动。</p>
+    </section>
+
+    <section>
+      <h2>我的分组</h2>
+      <label for="planText">用文字描述你想怎么分组</label>
+      <textarea id="planText" rows="5" placeholder="例如：&#10;Agent (Stable)：AI 工具和 agent 平台，claude、forge、chatgpt 之类&#10;Processing：正在处理的 bug 和 MR，mantis 单子、gitlab MR&#10;Works：日常工作，gitlab 项目、jira、confluence、公司内部系统&#10;Pesonal：个人的，gmail、youtube、购物"></textarea>
+      <div class="actions">
+        <button id="plan" class="primary">AI 分析生成分组</button>
+        <button id="import">从当前窗口导入现有组</button>
+        <button id="addGroup">手动添加一个组</button>
+        <span id="planStatus" class="status" role="status"></span>
+      </div>
+      <p class="hint">分析结果会显示在下面，确认或修改后点“保存分组”才生效。规则每行一条：<code>host:gitlab.com</code>、<code>url:/merge_requests</code>、<code>title:关键词</code>。</p>
+      <div id="groups"></div>
+      <div class="actions">
+        <button id="saveGroups" class="primary">保存分组</button>
+        <span id="groupsStatus" class="status" role="status"></span>
+      </div>
+    </section>
+
+    <section>
+      <h2>AI</h2>
+      <div class="grid">
+        <label for="provider">服务商</label>
+        <select id="provider">
+          <option value="deepseek">DeepSeek</option>
+          <option value="glm">智谱 GLM</option>
+          <option value="openai">OpenAI</option>
+          <option value="custom">自定义（OpenAI 兼容）</option>
+        </select>
+        <label for="baseURL">Base URL</label><input id="baseURL" spellcheck="false">
+        <label for="model">模型</label><input id="model" spellcheck="false">
+        <label for="apiKey">API key</label><input id="apiKey" type="password" spellcheck="false" autocomplete="off">
+        <label for="threshold">置信度阈值</label><input id="threshold" type="number" min="0" max="1" step="0.05">
+        <label for="neverSend">不发给 AI 的域名</label><textarea id="neverSend" rows="3" spellcheck="false" placeholder="每行一个，含子域名"></textarea>
+      </div>
+      <p class="hint">发给 AI 的只有标签页标题、域名和路径，不含 query 参数和页面内容。置信度低于阈值的结果不会自动移动，会出现在弹窗的“建议”里。API key 只存在本机。</p>
+      <div class="actions">
+        <button id="saveAI" class="primary">保存</button>
+        <button id="testAI">测试连接</button>
+        <span id="aiStatus" class="status" role="status"></span>
+      </div>
+    </section>
+
+    <section>
+      <h2>已学到的规则</h2>
+      <p class="hint">你把标签页手动拖进某个组时自动记下（域名 + 第一级路径 → 组）。拖出来会删掉对应的规则。</p>
+      <ul id="learned"></ul>
+      <div class="actions">
+        <button id="clearCache">清空 AI 判断缓存</button>
+        <span id="cacheStatus" class="status" role="status"></span>
+      </div>
+    </section>
+  </main>
+
+  <template id="groupTpl">
+    <div class="group">
+      <div class="groupHead">
+        <span class="swatch"></span>
+        <input class="name" placeholder="组名（和 Chrome 里的组名一致）">
+        <select class="color"></select>
+        <button class="remove" title="删除这个组">删除</button>
+      </div>
+      <textarea class="description" rows="2" placeholder="什么样的标签页属于这个组（给 AI 看）"></textarea>
+      <textarea class="rules" rows="3" spellcheck="false" placeholder="host:example.com&#10;url:/issues&#10;title:关键词"></textarea>
+    </div>
+  </template>
+
+  <script src="options.js" type="module"></script>
 </body>
 </html>

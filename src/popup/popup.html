@@ -1,5 +1,5 @@
 <!doctype html>
-<html>
+<html lang="zh">
 <head>
   <meta charset="utf-8">
   <link rel="stylesheet" href="popup.css">
@@ -9,9 +9,23 @@
     <h1>Tabmason</h1>
     <span id="count"></span>
   </header>
+  <label class="toggle"><input type="checkbox" id="enabled"> 自动归类</label>
+  <p id="noGroups" class="warn" hidden>还没有定义分组，<a href="#" id="openOptions2">去设置</a></p>
+  <button data-action="organizeWindow">整理当前窗口未分组的标签页</button>
   <button data-action="groupByDomain">Group by domain</button>
   <button data-action="closeDuplicates">Close duplicates</button>
   <p id="status" role="status"></p>
+
+  <section id="suggestBox" hidden>
+    <h2>建议（AI 不太确定）</h2>
+    <ul id="suggestions"></ul>
+  </section>
+  <section id="movesBox" hidden>
+    <h2>最近自动移动</h2>
+    <ul id="moves"></ul>
+  </section>
+
+  <a href="#" id="openOptions" class="link">设置分组与 AI</a>
   <script src="popup.js" type="module"></script>
 </body>
 </html>

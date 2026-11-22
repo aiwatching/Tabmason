@@ -4,10 +4,17 @@ Smart tab management for Chrome: group, tidy and park your tabs.
 
 ## Status
 
-0.1.0 skeleton (Manifest V3, plain JavaScript, no build step):
+0.2.0 (Manifest V3, plain JavaScript, no build step):
 
-- **Group by domain**: tabs from the same site go into one collapsed group (popup, or `Alt+Shift+G`).
-- **Close duplicates**: closes tabs with the same URL in the current window.
+- **Auto-grouping into your own groups**: when a tab finishes loading, Tabmason puts it into one of the groups *you* defined. It never invents groups.
+  Decision order: rules learned from your manual drags → your group rules → cached AI answers → AI (DeepSeek / GLM / any OpenAI-compatible API).
+  Low-confidence AI answers become suggestions in the popup instead of moves.
+- **Define groups in words**: on the options page, describe your groups in plain text; the AI turns it into group profiles (name, color, description, rules) that you review and save. Or import the named groups of the current window.
+- **Learns from you**: drag a tab into one of your groups and Tabmason remembers `host/first-path-segment → group`; drag it out and that rule is forgotten.
+- **Popup**: auto on/off, organize ungrouped tabs in this window, AI suggestions, recent moves with undo.
+- **Group by domain** (`Alt+Shift+G`) and **Close duplicates**, as before.
+
+Only tab title, host and path go to the AI (no query string, no page content); hosts in the "never send" list stay local.
 
 ## Run it locally
 
@@ -21,8 +28,12 @@ After editing a file, press the reload button on the Tabmason card.
 
 ```
 manifest.json          extension manifest (MV3)
-src/background.js      service worker: tab actions + keyboard command
+src/background.js      service worker: message handlers, keyboard command
+src/auto/engine.js     auto-grouping: tab events, batching, moving, learning from drags
+src/auto/classifier.js rules / learned / cache / AI classification, text -> group plan
+src/lib/llm.js         OpenAI-compatible chat client
+src/lib/store.js       chrome.storage helpers and defaults
 src/popup/             toolbar popup
-src/options/           options page (placeholder)
+src/options/           groups, AI and learned-rule settings
 icons/                 placeholder icons
 ```
