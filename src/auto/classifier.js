@@ -3,7 +3,7 @@
 // The answer is always one of the user's group names, or null. Never a new group.
 
 import { chatJSON } from '../lib/llm.js';
-import { COLORS, getLocal, updateLocal, urlKey } from '../lib/store.js';
+import { COLORS, getLocal, sameName, updateLocal, urlKey } from '../lib/store.js';
 
 export function ruleMatches(rule, tab) {
   const s = String(rule).trim();
@@ -110,7 +110,7 @@ export async function planGroups(text, current, settings) {
     '如果描述里提到的组和"当前已有的组"是同一个意思，必须沿用已有组的名字和颜色（一字不差），这样才能对上已经存在的组。',
     '只输出用户描述中提到的组，不要自己发明额外的组。',
     `color 只能是：${COLORS.join(', ')}。`,
-    'description 用一两句话说明什么样的标签页属于这个组，给之后的自动分类用。',
+    'description 用一两句话说明什么样的标签页属于这个组，给之后的自动分类用；使用和用户描述相同的语言。',
     'rules 是确定性的匹配规则，每条是字符串："host:域名"（含子域名）、"url:网址片段" 或 "title:标题关键词"。只写有把握的，没有就给空数组。',
     '只输出 JSON：{"groups":[{"name":"","color":"","description":"","rules":[]}]}',
   ].join('\n');
@@ -125,8 +125,13 @@ export async function planGroups(text, current, settings) {
   const res = await chatJSON(settings.llm, system, user, { timeoutMs: 60000 });
   return (res.groups || [])
     .filter((g) => g && String(g.name || '').trim())
+    .map((g) => {
+      // Snap to the Chrome group that already exists, so "works" from the AI reuses "Works" instead of a new group.
+      const existing = current.find((c) => sameName(c.name, g.name));
+      return { ...g, name: existing ? existing.name : String(g.name).trim(), color: existing ? existing.color : g.color };
+    })
     .map((g) => ({
-      name: String(g.name).trim(),
+      name: g.name,
       color: COLORS.includes(g.color) ? g.color : 'grey',
       description: String(g.description || ''),
       rules: Array.isArray(g.rules) ? g.rules.map(String).filter(Boolean) : [],

@@ -15,6 +15,7 @@ export const PROVIDERS = {
 
 export const DEFAULT_SETTINGS = {
   enabled: true,
+  lang: 'auto', // 'auto' | 'zh' | 'en'
   regroupOnRefresh: false, // re-classify tabs that are already in a group
   llm: { provider: 'deepseek', ...PROVIDERS.deepseek, apiKey: '' },
   threshold: 0.7,
@@ -60,4 +61,11 @@ export function urlKey(url) {
     const seg = u.pathname.split('/').filter(Boolean)[0] || '';
     return `${u.host.replace(/^www\./, '')}/${seg}`;
   } catch { return null; }
+}
+
+/** Loose group-name identity: "Works", " works ", "WORKS 🛠" all name the same group. */
+export function sameName(a, b) {
+  const norm = (s) => String(s || '').normalize('NFKC').toLowerCase().replace(/[^\p{L}\p{N}]+/gu, '');
+  const na = norm(a);
+  return na !== '' && na === norm(b);
 }

@@ -1,0 +1,128 @@
+/* Shared tokens and components for the popup and the options page. */
+:root {
+  color-scheme: light;
+  --bg: #f5f5f2;
+  --surface: #ffffff;
+  --surface-2: #efefeb;
+  --border: #e2e1dc;
+  --border-strong: #cfcdc6;
+  --text: #1c1c1a;
+  --muted: #6b6a64;
+  --accent: #2c6e5c;
+  --accent-hover: #245a4b;
+  --accent-soft: #e3efea;
+  --accent-fg: #ffffff;
+  --danger: #b42318;
+  --ok: #2c6e5c;
+  --shadow: 0 1px 2px rgb(20 20 18 / .05), 0 4px 16px rgb(20 20 18 / .04);
+  --radius: 10px;
+  --radius-sm: 7px;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+
+  /* Chrome tab-group colors (light theme) */
+  --g-grey: #5f6368; --g-blue: #1a73e8; --g-red: #d93025; --g-yellow: #f9ab00; --g-green: #188038;
+  --g-pink: #d01884; --g-purple: #a142f4; --g-cyan: #007b83; --g-orange: #fa7b17;
+  --g-fg: #ffffff;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+    --bg: #131312;
+    --surface: #1c1c1a;
+    --surface-2: #252522;
+    --border: #31302c;
+    --border-strong: #45433e;
+    --text: #ecebe6;
+    --muted: #9b9991;
+    --accent: #79c2ab;
+    --accent-hover: #93d1bd;
+    --accent-soft: #1f3530;
+    --accent-fg: #0f211c;
+    --danger: #f97066;
+    --ok: #79c2ab;
+    --shadow: 0 1px 2px rgb(0 0 0 / .3);
+
+    --g-grey: #bdc1c6; --g-blue: #8ab4f8; --g-red: #f28b82; --g-yellow: #fdd663; --g-green: #81c995;
+    --g-pink: #ff8bcb; --g-purple: #c58af9; --g-cyan: #78d9ec; --g-orange: #fcad70;
+    --g-fg: #202124;
+  }
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 14px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+[hidden] { display: none !important; }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* ---------- buttons ---------- */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  height: 32px; padding: 0 12px;
+  font: inherit; font-size: 13px; font-weight: 500;
+  color: var(--text); background: var(--surface);
+  border: 1px solid var(--border-strong); border-radius: var(--radius-sm);
+  cursor: pointer; white-space: nowrap;
+  transition: background-color .12s, border-color .12s;
+}
+.btn:hover { background: var(--surface-2); }
+.btn:disabled { opacity: .55; cursor: progress; }
+.btn-primary { background: var(--accent); border-color: var(--accent); color: var(--accent-fg); }
+.btn-primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+.btn-ghost { background: transparent; border-color: transparent; color: var(--muted); }
+.btn-ghost:hover { background: var(--surface-2); color: var(--text); }
+.btn-sm { height: 26px; padding: 0 8px; font-size: 12px; }
+.btn-danger:hover { color: var(--danger); }
+
+/* ---------- fields ---------- */
+.input, .select, .textarea {
+  width: 100%;
+  font: inherit; font-size: 13px; color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border-strong); border-radius: var(--radius-sm);
+  padding: 7px 10px;
+  transition: border-color .12s, box-shadow .12s;
+}
+.input:focus, .select:focus, .textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+.textarea { resize: vertical; line-height: 1.55; }
+.mono { font-family: var(--mono); font-size: 12px; }
+
+/* ---------- switch ---------- */
+.switch { position: relative; display: inline-block; width: 34px; height: 20px; flex: none; }
+.switch input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
+.switch span {
+  position: absolute; inset: 0; border-radius: 999px; background: var(--border-strong);
+  transition: background-color .15s; pointer-events: none;
+}
+.switch span::after {
+  content: ""; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; border-radius: 50%;
+  background: #fff; box-shadow: 0 1px 2px rgb(0 0 0 / .25); transition: transform .15s;
+}
+.switch input:checked + span { background: var(--accent); }
+.switch input:checked + span::after { transform: translateX(14px); }
+.switch input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* ---------- group pill (looks like a Chrome tab-group label) ---------- */
+.pill {
+  display: inline-flex; align-items: center; max-width: 100%;
+  height: 20px; padding: 0 8px; border-radius: 6px;
+  font-size: 12px; font-weight: 600; line-height: 20px;
+  color: var(--g-fg); background: var(--g-grey);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.c-grey { --c: var(--g-grey); } .c-blue { --c: var(--g-blue); } .c-red { --c: var(--g-red); }
+.c-yellow { --c: var(--g-yellow); } .c-green { --c: var(--g-green); } .c-pink { --c: var(--g-pink); }
+.c-purple { --c: var(--g-purple); } .c-cyan { --c: var(--g-cyan); } .c-orange { --c: var(--g-orange); }
+.pill[class*="c-"] { background: var(--c); }
+
+.status { font-size: 12px; color: var(--muted); min-height: 18px; }
+.status.ok { color: var(--ok); }
+.status.error { color: var(--danger); }
+/* Yellow is too light for white text in the light theme. */
+@media (prefers-color-scheme: light) { .pill.c-yellow { color: #202124; } }

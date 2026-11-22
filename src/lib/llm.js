@@ -1,7 +1,7 @@
 // OpenAI-compatible chat client (DeepSeek, GLM, OpenAI and any compatible endpoint).
 
 export async function chatJSON(llm, system, user, { timeoutMs = 20000 } = {}) {
-  if (!llm?.apiKey || !llm?.baseURL || !llm?.model) throw new Error('AI 未配置：请在设置页填写 baseURL / model / API key');
+  if (!llm?.apiKey || !llm?.baseURL || !llm?.model) throw new Error('AI not configured: set Base URL, model and API key in Tabmason settings');
   const ctrl = new AbortController();
   const timer = setTimeout(() => ctrl.abort(), timeoutMs);
   try {
@@ -16,7 +16,7 @@ export async function chatJSON(llm, system, user, { timeoutMs = 20000 } = {}) {
         messages: [{ role: 'system', content: system }, { role: 'user', content: user }],
       }),
     });
-    if (!res.ok) throw new Error(`AI 请求失败 ${res.status}: ${(await res.text()).slice(0, 300)}`);
+    if (!res.ok) throw new Error(`AI request failed (${res.status}): ${(await res.text()).slice(0, 300)}`);
     const data = await res.json();
     return parseJSON(data.choices?.[0]?.message?.content ?? '');
   } finally {
@@ -30,5 +30,5 @@ function parseJSON(text) {
   const start = text.indexOf('{');
   const end = text.lastIndexOf('}');
   if (start >= 0 && end > start) return JSON.parse(text.slice(start, end + 1));
-  throw new Error(`AI 返回的不是 JSON：${text.slice(0, 200)}`);
+  throw new Error(`AI reply was not JSON: ${text.slice(0, 200)}`);
 }

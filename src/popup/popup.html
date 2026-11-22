@@ -1,31 +1,50 @@
 <!doctype html>
-<html lang="zh">
+<html lang="zh-CN">
 <head>
   <meta charset="utf-8">
+  <link rel="stylesheet" href="../ui/theme.css">
   <link rel="stylesheet" href="popup.css">
 </head>
 <body>
-  <header>
-    <h1>Tabmason</h1>
-    <span id="count"></span>
+  <header class="head">
+    <img src="../../icons/icon48.png" alt="" width="22" height="22">
+    <div class="title">
+      <div class="name">Tabmason</div>
+      <div id="count" class="count"></div>
+    </div>
+    <label class="auto">
+      <span data-i18n="auto"></span>
+      <span class="switch"><input type="checkbox" id="enabled"><span></span></span>
+    </label>
   </header>
-  <label class="toggle"><input type="checkbox" id="enabled"> 自动归类</label>
-  <p id="noGroups" class="warn" hidden>还没有定义分组，<a href="#" id="openOptions2">去设置</a></p>
-  <button data-action="organizeWindow">整理当前窗口未分组的标签页</button>
-  <button data-action="groupByDomain">Group by domain</button>
-  <button data-action="closeDuplicates">Close duplicates</button>
-  <p id="status" role="status"></p>
 
-  <section id="suggestBox" hidden>
-    <h2>建议（AI 不太确定）</h2>
-    <ul id="suggestions"></ul>
-  </section>
-  <section id="movesBox" hidden>
-    <h2>最近自动移动</h2>
-    <ul id="moves"></ul>
+  <div id="noGroups" class="banner" hidden>
+    <span data-i18n="noGroups"></span>
+    <a href="#" class="openOptions" data-i18n="setUp"></a>
+  </div>
+
+  <button class="btn btn-primary organize" data-action="organizeWindow">
+    <span data-i18n="organize"></span>
+  </button>
+  <div class="secondary">
+    <button class="btn" data-action="groupByDomain" data-i18n="groupByDomain"></button>
+    <button class="btn" data-action="closeDuplicates" data-i18n="closeDuplicates"></button>
+  </div>
+  <p id="status" class="status" role="status"></p>
+
+  <section id="suggestBox" class="block" hidden>
+    <div class="block-head"><h2 data-i18n="suggestions"></h2><span class="block-hint" data-i18n="suggestionsHint"></span></div>
+    <ul id="suggestions" class="list"></ul>
   </section>
 
-  <a href="#" id="openOptions" class="link">设置分组与 AI</a>
+  <section id="movesBox" class="block" hidden>
+    <div class="block-head"><h2 data-i18n="recentMoves"></h2></div>
+    <ul id="moves" class="list"></ul>
+  </section>
+
+  <footer class="foot">
+    <a href="#" class="openOptions" data-i18n="settings"></a>
+  </footer>
   <script src="popup.js" type="module"></script>
 </body>
 </html>

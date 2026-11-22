@@ -1,7 +1,7 @@
 // Auto-grouping: watch tabs finish loading, put them into the user's groups, learn from manual drags.
 
 import { canSendToAI, classifyLocal, classifyWithAI, rememberAI } from './classifier.js';
-import { getLocal, getSession, getSettings, setSession, updateLocal, updateSession, urlKey } from '../lib/store.js';
+import { getLocal, getSession, getSettings, sameName, setSession, updateLocal, updateSession, urlKey } from '../lib/store.js';
 
 const SETTLE_MS = 1500; // SPA titles change after "complete"; also batches tabs opened together
 const BOOT_QUIET_MS = 15000; // Chrome restoring groups at startup is not the user dragging
@@ -9,27 +9,56 @@ const OURS_TTL_MS = 5000;
 
 // ---------- moving tabs ----------
 
-/** Put tabs into the group named `name` in their window, creating that (user-defined) group there if needed. */
-export async function moveToGroup(tabIds, name) {
-  const groups = await getLocal('groups', []);
-  const profile = groups.find((g) => g.name === name);
-  if (!profile || !tabIds.length) return;
-  const tabs = await Promise.all(tabIds.map((id) => chrome.tabs.get(id).catch(() => null)));
-  const byWindow = new Map();
-  for (const t of tabs) if (t) byWindow.set(t.windowId, [...(byWindow.get(t.windowId) || []), t.id]);
+// Moves are serialized: two batches racing would each miss the other's new group and create a duplicate.
+let lock = Promise.resolve();
+function serialized(fn) {
+  const run = lock.then(fn, fn);
+  lock = run.catch(() => {});
+  return run;
+}
 
-  const now = Date.now();
-  await updateSession('ours', {}, (o) => { for (const id of tabIds) o[id] = now; return o; });
-
-  for (const [windowId, ids] of byWindow) {
-    const [existing] = await chrome.tabGroups.query({ windowId, title: name });
-    if (existing) {
-      await chrome.tabs.group({ tabIds: ids, groupId: existing.id });
-    } else {
-      const groupId = await chrome.tabs.group({ tabIds: ids, createProperties: { windowId } });
-      await chrome.tabGroups.update(groupId, { title: name, color: profile.color || 'grey' });
+/**
+ * The window's Chrome group for a profile name, matched loosely (case, spaces, emoji).
+ * If several groups in the window match, their tabs are merged into the first one.
+ */
+async function findGroup(windowId, name) {
+  const matches = (await chrome.tabGroups.query({ windowId })).filter((g) => sameName(g.title, name));
+  if (matches.length > 1) {
+    const [keep, ...extra] = matches;
+    for (const g of extra) {
+      const ids = (await chrome.tabs.query({ groupId: g.id })).map((t) => t.id);
+      if (ids.length) await markOurs(ids).then(() => chrome.tabs.group({ tabIds: ids, groupId: keep.id }));
     }
   }
+  return matches[0] || null;
+}
+
+async function markOurs(tabIds) {
+  const now = Date.now();
+  await updateSession('ours', {}, (o) => { for (const id of tabIds) o[id] = now; return o; });
+}
+
+/** Put tabs into the user's group `name` in their window, creating that (user-defined) group there if missing. */
+export function moveToGroup(tabIds, name) {
+  return serialized(async () => {
+    const groups = await getLocal('groups', []);
+    const profile = groups.find((g) => g.name === name);
+    if (!profile || !tabIds.length) return;
+    const tabs = await Promise.all(tabIds.map((id) => chrome.tabs.get(id).catch(() => null)));
+    const byWindow = new Map();
+    for (const t of tabs) if (t) byWindow.set(t.windowId, [...(byWindow.get(t.windowId) || []), t.id]);
+
+    await markOurs(tabIds);
+    for (const [windowId, ids] of byWindow) {
+      const existing = await findGroup(windowId, name);
+      if (existing) {
+        await chrome.tabs.group({ tabIds: ids, groupId: existing.id });
+      } else {
+        const groupId = await chrome.tabs.group({ tabIds: ids, createProperties: { windowId } });
+        await chrome.tabGroups.update(groupId, { title: name, color: profile.color || 'grey' });
+      }
+    }
+  });
 }
 
 async function logMove(tab, group, source) {
@@ -64,7 +93,7 @@ export async function organize(tabs, { useAI = true } = {}) {
 
   if (forAI.length) {
     try {
-      const examples = await groupExamples(forAI[0].windowId);
+      const examples = await groupExamples(forAI[0].windowId, groups);
       const answers = await classifyWithAI(forAI, groups, examples, settings);
       for (const tab of forAI) {
         const a = answers.get(tab.id);
@@ -91,14 +120,14 @@ export async function organize(tabs, { useAI = true } = {}) {
   return result;
 }
 
-/** Tabs already in each named group of a window, as AI few-shot examples. */
-async function groupExamples(windowId) {
+/** Tabs already in each of the user's groups in a window (keyed by profile name), as AI few-shot examples. */
+async function groupExamples(windowId, profiles) {
   const out = {};
-  const tgs = await chrome.tabGroups.query({ windowId });
-  for (const g of tgs) {
-    if (!g.title) continue;
+  for (const g of await chrome.tabGroups.query({ windowId })) {
+    const p = profiles.find((x) => sameName(x.name, g.title));
+    if (!p) continue;
     const tabs = await chrome.tabs.query({ groupId: g.id });
-    out[g.title] = tabs.map((t) => ({ title: t.title, url: t.url }));
+    out[p.name] = [...(out[p.name] || []), ...tabs.map((t) => ({ title: t.title, url: t.url }))];
   }
   return out;
 }
@@ -167,8 +196,9 @@ async function onGroupChanged(tabId, groupId, tab) {
   // Dragged into a group: if it is one of the user's groups, remember this page's key -> that group.
   const g = await chrome.tabGroups.get(groupId).catch(() => null);
   const groups = await getLocal('groups', []);
-  if (!g?.title || !key || !groups.some((p) => p.name === g.title)) return;
-  await updateLocal('learned', {}, (l) => { l[key] = g.title; return l; });
+  const profile = g?.title && groups.find((p) => sameName(p.name, g.title));
+  if (!profile || !key) return;
+  await updateLocal('learned', {}, (l) => { l[key] = profile.name; return l; });
   await updateSession('manualOut', {}, (m) => { delete m[tabId]; return m; });
 }
 
