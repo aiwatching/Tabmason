@@ -138,6 +138,7 @@ AI 由你掌控
 **Data usage** — in the first group check:
 - **Web history** (tab titles and URLs are sent to the AI provider the user configures, for sorting)
 - **Website content** (page text is sent to that provider when the user asks for an AI summary)
+- **Authentication information** (the user's own API key is sent to the AI provider the user configured; conservative disclosure)
 
 In the second group certify all three: not sold to third parties; not used or transferred for purposes unrelated to the single purpose; not used to determine creditworthiness or for lending.
 
