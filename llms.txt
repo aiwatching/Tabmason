@@ -12,6 +12,7 @@ Key facts:
 - Snapshots: every 10 minutes (deduplicated, newest 24 kept) plus manual saves; restore rebuilds windows, groups (name, color, collapsed) and pinned tabs, loading background tabs lazily.
 - Token usage per day and per purpose is shown on the settings page.
 - Install: Chrome Web Store (coming soon) or load unpacked from source.
+- License: MIT.
 
 ## Docs
 

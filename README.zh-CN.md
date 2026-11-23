@@ -118,3 +118,7 @@ Chrome 不允许扩展改单个标签的底色，所以改为标记图标（和�
 - 上架资料（介绍文字、权限说明、数据声明）见 [STORE.md](STORE.md)。
 
 问题和建议：https://github.com/aiwatching/Tabmason/issues
+
+## 许可证
+
+[MIT](LICENSE)

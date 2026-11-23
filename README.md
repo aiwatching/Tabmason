@@ -145,3 +145,7 @@ scripts/               package.sh (store zip), render-icons.mjs
 - Store submission details (listing text, permission justifications, data disclosures): [STORE.md](STORE.md).
 
 Issues and ideas: https://github.com/aiwatching/Tabmason/issues
+
+## License
+
+[MIT](LICENSE)
