@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tabmason</title>
+  <link rel="icon" href="../../icons/icon48.png">
+  <link rel="stylesheet" href="../ui/theme.css">
+  <link rel="stylesheet" href="overview.css">
+</head>
+<body>
+  <header class="bar">
+    <div class="brand">
+      <img src="../../icons/icon48.png" alt="" width="24" height="24">
+      <span>Tabmason</span>
+    </div>
+    <input id="search" class="input search" type="search" data-i18n-ph="searchPh" autocomplete="off">
+    <div class="seg" role="tablist">
+      <button id="scopeWindow" role="tab" data-i18n="thisWindow"></button>
+      <button id="scopeAll" role="tab" data-i18n="allWindows"></button>
+    </div>
+    <button id="fill" class="btn" data-i18n="fillThumbs" data-i18n-title="fillThumbsHint"></button>
+    <span id="status" class="status" role="status"></span>
+  </header>
+
+  <main id="main"></main>
+  <p id="empty" class="empty" data-i18n="noResults" hidden></p>
+
+  <template id="cardTpl">
+    <article class="tab" tabindex="0">
+      <div class="thumb">
+        <img class="shot" alt="" hidden>
+        <div class="ph"><img class="ph-icon" alt="" width="32" height="32"><span class="ph-text"></span></div>
+        <span class="badge" hidden></span>
+        <button class="close" type="button">×</button>
+      </div>
+      <div class="meta">
+        <img class="fav" alt="" width="16" height="16">
+        <div class="text">
+          <div class="title"></div>
+          <div class="host"></div>
+        </div>
+      </div>
+      <div class="note" hidden><span class="dot"></span><span class="note-text"></span></div>
+    </article>
+  </template>
+
+  <script src="overview.js" type="module"></script>
+</body>
+</html>

@@ -148,6 +148,7 @@ async function flush() {
   queue.clear();
   const settings = await getSettings();
   if (!settings.enabled) return;
+  if (Date.now() < (await getSession('pauseAutoUntil', 0))) return; // restoring a snapshot
   const manualOut = await getSession('manualOut', {});
   const tabs = [];
   for (const id of ids) {
@@ -182,6 +183,7 @@ async function onGroupChanged(tabId, groupId, tab) {
   }
   const bootTs = await getSession('bootTs', 0);
   if (Date.now() - bootTs < BOOT_QUIET_MS) return;
+  if (Date.now() < (await getSession('pauseAutoUntil', 0))) return; // a snapshot restore regrouping tabs
 
   const key = urlKey(tab.url);
   if (groupId === chrome.tabGroups.TAB_GROUP_ID_NONE) {

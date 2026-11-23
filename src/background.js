@@ -4,8 +4,31 @@ import { initEngine, moveToGroup, organize } from './auto/engine.js';
 import { planGroups } from './auto/classifier.js';
 import { chatJSON } from './lib/llm.js';
 import { getSettings, updateSession } from './lib/store.js';
+import { composeFavicon, injectIntoOpenTabs, notifyUrlChange, summarizeTab } from './sw/marks.js';
+import { fillMissing, initThumbnails } from './sw/thumbnails.js';
+import { deleteSnapshot, initSnapshots, listSnapshots, renameSnapshot, restoreSnapshot, saveSnapshot } from './sw/snapshots.js';
 
+// Listeners must be registered synchronously at top level so events that wake the worker are delivered.
 initEngine();
+initThumbnails();
+initSnapshots();
+
+chrome.runtime.onInstalled.addListener(() => { injectIntoOpenTabs().catch(() => {}); });
+chrome.tabs.onUpdated.addListener((tabId, changeInfo) => { if (changeInfo.url) notifyUrlChange(tabId); });
+
+const OVERVIEW = chrome.runtime.getURL('src/overview/overview.html');
+
+/** Open the overview page, or focus it if it is already open. */
+async function openOverview() {
+  const [existing] = await chrome.tabs.query({ url: `${OVERVIEW}*` });
+  if (existing) {
+    await chrome.tabs.update(existing.id, { active: true });
+    await chrome.windows.update(existing.windowId, { focused: true });
+  } else {
+    await chrome.tabs.create({ url: OVERVIEW });
+  }
+  return true;
+}
 
 export async function groupByDomain(windowId) {
   const tabs = await chrome.tabs.query({ windowId, pinned: false });
@@ -42,6 +65,7 @@ export async function closeDuplicates(windowId) {
 chrome.commands.onCommand.addListener(async (command) => {
   const win = await chrome.windows.getCurrent();
   if (command === 'group-by-domain') await groupByDomain(win.id);
+  if (command === 'open-overview') await openOverview();
 });
 
 /** Ungrouped, unpinned web tabs of a window, classified and moved. */
@@ -80,7 +104,7 @@ async function undoMove({ tabId, ts }) {
 }
 
 async function testLLM({ llm }) {
-  const r = await chatJSON(llm, '只输出 JSON。', '返回 {"ok":true}');
+  const r = await chatJSON(llm, '只输出 JSON。', '返回 {"ok":true}', { kind: 'test' });
   return r?.ok === true;
 }
 
@@ -94,6 +118,17 @@ const handlers = {
   dismissSuggestion,
   undoMove,
   testLLM,
+  openOverview,
+  saveSnapshot: (m) => saveSnapshot(m.name),
+  listSnapshots,
+  restoreSnapshot: (m) => restoreSnapshot(m.id),
+  deleteSnapshot: (m) => deleteSnapshot(m.id),
+  renameSnapshot: (m) => renameSnapshot(m.id, m.name),
+  composeFavicon,
+  summarizeTab: (m) => summarizeTab(m.tabId),
+  fillThumbs: (m) => fillMissing(m.tabIds, (done, total) => {
+    chrome.runtime.sendMessage({ event: 'fillProgress', done, total }).catch(() => {});
+  }),
 };
 
 chrome.runtime.onMessage.addListener((msg, _sender, reply) => {

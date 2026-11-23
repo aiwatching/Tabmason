@@ -17,6 +17,8 @@ export const DEFAULT_SETTINGS = {
   enabled: true,
   lang: 'auto', // 'auto' | 'zh' | 'en'
   regroupOnRefresh: false, // re-classify tabs that are already in a group
+  markTitlePrefix: true, // marked tabs also get a colored emoji in front of their title
+  markNoteInTitle: false, // append the note to the title so Chrome's hover card shows it
   llm: { provider: 'deepseek', ...PROVIDERS.deepseek, apiKey: '' },
   threshold: 0.7,
   neverSendHosts: ['localhost', '127.0.0.1'], // hosts whose tabs are never sent to the AI

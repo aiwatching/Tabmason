@@ -122,12 +122,40 @@
         </div>
         <span class="switch"><input type="checkbox" id="regroupOnRefresh"><span></span></span>
       </label>
+      <label class="toggle-row">
+        <div>
+          <div class="toggle-title" data-i18n="titlePrefixLabel"></div>
+          <div class="hint" data-i18n="titlePrefixHint"></div>
+        </div>
+        <span class="switch"><input type="checkbox" id="markTitlePrefix"><span></span></span>
+      </label>
+      <label class="toggle-row">
+        <div>
+          <div class="toggle-title" data-i18n="noteInTitleLabel"></div>
+          <div class="hint" data-i18n="noteInTitleHint"></div>
+        </div>
+        <span class="switch"><input type="checkbox" id="markNoteInTitle"><span></span></span>
+      </label>
+    </section>
+
+    <!-- Usage -->
+    <section class="card">
+      <div class="card-head">
+        <span class="step">4</span>
+        <div>
+          <h2 data-i18n="secUsage"></h2>
+          <p class="sub" data-i18n="secUsageSub"></p>
+        </div>
+      </div>
+      <div id="usageStats" class="stats"></div>
+      <table id="usageTable" class="usage-table"></table>
+      <p id="usageEmpty" class="empty" data-i18n="usageEmpty" hidden></p>
     </section>
 
     <!-- Learned -->
     <section class="card">
       <div class="card-head">
-        <span class="step">4</span>
+        <span class="step">5</span>
         <div>
           <h2 data-i18n="secLearned"></h2>
           <p class="sub" data-i18n="secLearnedSub"></p>

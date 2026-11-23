@@ -26,11 +26,25 @@
   <button class="btn btn-primary organize" data-action="organizeWindow">
     <span data-i18n="organize"></span>
   </button>
+  <button class="btn overviewBtn" id="openOverview" data-i18n="overview"></button>
   <div class="secondary">
     <button class="btn" data-action="groupByDomain" data-i18n="groupByDomain"></button>
     <button class="btn" data-action="closeDuplicates" data-i18n="closeDuplicates"></button>
   </div>
   <p id="status" class="status" role="status"></p>
+
+  <section id="markBox" class="block">
+    <div class="block-head"><h2 data-i18n="thisTab"></h2></div>
+    <div id="markTitle" class="mark-title"></div>
+    <div id="markColors" class="mark-colors" role="radiogroup"></div>
+    <p id="markHint" class="mark-hint" hidden><span id="markHintText"></span> <a href="#" id="fileAccessLink" data-i18n="enableFileAccess" hidden></a></p>
+    <textarea id="markNote" class="textarea" rows="2" data-i18n-ph="notePh"></textarea>
+    <div class="mark-actions">
+      <button id="aiSummary" class="btn btn-sm" data-i18n="aiSummary" data-i18n-title="summaryHint"></button>
+      <span id="markStatus" class="status"></span>
+    </div>
+  </section>
+  <p id="notMarkable" class="status" data-i18n="notMarkable" hidden></p>
 
   <section id="suggestBox" class="block" hidden>
     <div class="block-head"><h2 data-i18n="suggestions"></h2><span class="block-hint" data-i18n="suggestionsHint"></span></div>
@@ -40,6 +54,24 @@
   <section id="movesBox" class="block" hidden>
     <div class="block-head"><h2 data-i18n="recentMoves"></h2></div>
     <ul id="moves" class="list"></ul>
+  </section>
+
+  <section id="markedBox" class="block" hidden>
+    <div class="block-head"><h2 data-i18n="marked"></h2></div>
+    <ul id="markedList" class="list"></ul>
+  </section>
+
+  <section class="block">
+    <div class="block-head">
+      <h2 data-i18n="snapshots"></h2>
+      <span class="spacer"></span>
+      <button id="saveSnapshot" class="btn btn-sm" data-i18n="saveSnapshot"></button>
+    </div>
+    <p class="block-hint snap-hint" data-i18n="snapshotsHint"></p>
+    <ul id="snapList" class="list"></ul>
+    <p id="snapEmpty" class="block-hint" data-i18n="noSnapshots" hidden></p>
+    <button id="snapMore" class="btn btn-ghost btn-sm" hidden></button>
+    <p id="snapStatus" class="status"></p>
   </section>
 
   <footer class="foot">

@@ -3,6 +3,7 @@
 // The answer is always one of the user's group names, or null. Never a new group.
 
 import { chatJSON } from '../lib/llm.js';
+import { cleanTitle } from '../lib/marks.js';
 import { COLORS, getLocal, sameName, updateLocal, urlKey } from '../lib/store.js';
 
 export function ruleMatches(rule, tab) {
@@ -14,7 +15,7 @@ export function ruleMatches(rule, tab) {
   const pat = raw.toLowerCase();
   if (!pat) return false;
   const url = (tab.url || '').toLowerCase();
-  if (kind === 'title') return (tab.title || '').toLowerCase().includes(pat);
+  if (kind === 'title') return cleanTitle(tab.title).toLowerCase().includes(pat);
   if (kind === 'host') {
     let host;
     try { host = new URL(tab.url).host.toLowerCase(); } catch { return false; }
@@ -75,11 +76,11 @@ export async function classifyWithAI(tabs, groups, examples, settings) {
       examples: (examples[g.name] || [])
         .filter((t) => canSendToAI(t, settings))
         .slice(0, 6)
-        .map((t) => `${t.title} — ${hostOf(t.url)}${pathOf(t.url)}`),
+        .map((t) => `${cleanTitle(t.title)} — ${hostOf(t.url)}${pathOf(t.url)}`),
     })),
-    tabs: tabs.map((t) => ({ id: t.id, title: t.title, host: hostOf(t.url), path: pathOf(t.url) })),
+    tabs: tabs.map((t) => ({ id: t.id, title: cleanTitle(t.title), host: hostOf(t.url), path: pathOf(t.url) })),
   });
-  const res = await chatJSON(settings.llm, system, user);
+  const res = await chatJSON(settings.llm, system, user, { kind: 'classify' });
   for (const r of res.results || []) {
     const id = Number(r.id);
     if (!tabs.some((t) => t.id === id)) continue;
@@ -119,10 +120,10 @@ export async function planGroups(text, current, settings) {
     currentGroups: current.map((g) => ({
       name: g.name,
       color: g.color,
-      tabs: g.tabs.filter((t) => canSendToAI(t, settings)).slice(0, 8).map((t) => `${t.title} — ${hostOf(t.url)}`),
+      tabs: g.tabs.filter((t) => canSendToAI(t, settings)).slice(0, 8).map((t) => `${cleanTitle(t.title)} — ${hostOf(t.url)}`),
     })),
   });
-  const res = await chatJSON(settings.llm, system, user, { timeoutMs: 60000 });
+  const res = await chatJSON(settings.llm, system, user, { timeoutMs: 60000, kind: 'plan' });
   return (res.groups || [])
     .filter((g) => g && String(g.name || '').trim())
     .map((g) => {

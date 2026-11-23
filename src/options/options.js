@@ -1,5 +1,6 @@
 import { COLORS, PROVIDERS, getLocal, getSettings, sameName, saveSettings, setLocal } from '../lib/store.js';
 import { DEFAULT_PLANS, applyI18n, makeT, resolveLang } from '../lib/i18n.js';
+import { dayKey } from '../lib/llm.js';
 
 const $ = (id) => document.getElementById(id);
 const win = await chrome.windows.getCurrent();
@@ -44,6 +45,7 @@ function applyAll() {
   document.title = t('optionsTitle');
   for (const card of document.querySelectorAll('#groups .group')) card.refresh();
   renderLearned();
+  renderUsage();
 }
 
 // ---------- groups ----------
@@ -227,12 +229,53 @@ $('testAI').addEventListener('click', async () => {
 
 // ---------- behavior ----------
 
-for (const id of ['enabled', 'regroupOnRefresh']) {
+for (const id of ['enabled', 'regroupOnRefresh', 'markTitlePrefix', 'markNoteInTitle']) {
   $(id).checked = settings[id];
   $(id).addEventListener('change', async () => {
     settings = { ...(await getSettings()), [id]: $(id).checked };
     await saveSettings(settings);
   });
+}
+
+// ---------- usage ----------
+
+const fmt = (n) => new Intl.NumberFormat(lang === 'zh' ? 'zh-CN' : 'en', { notation: n >= 100000 ? 'compact' : 'standard' }).format(n);
+
+async function renderUsage() {
+  const usage = await getLocal('usage', {});
+  const days = Object.keys(usage).sort().reverse();
+  $('usageEmpty').hidden = days.length > 0;
+  $('usageStats').hidden = !days.length;
+  $('usageTable').hidden = !days.length;
+  if (!days.length) return;
+  const since = (n) => { const d = new Date(); d.setDate(d.getDate() - (n - 1)); return dayKey(d); };
+  const sum = (from) => days.filter((d) => d >= from).reduce((a, d) => {
+    a.calls += usage[d].calls; a.in += usage[d].in; a.out += usage[d].out;
+    for (const [k, v] of Object.entries(usage[d].kinds || {})) {
+      const x = (a.kinds[k] ||= { calls: 0, in: 0, out: 0 });
+      x.calls += v.calls; x.in += v.in; x.out += v.out;
+    }
+    return a;
+  }, { calls: 0, in: 0, out: 0, kinds: {} });
+  const periods = [['usageToday', sum(since(1))], ['usage7', sum(since(7))], ['usage30', sum(since(30))]];
+  $('usageStats').replaceChildren(...periods.map(([label, s]) => {
+    const el = document.createElement('div');
+    el.className = 'stat';
+    el.innerHTML = '<div class="stat-label"></div><div class="stat-value"></div><div class="stat-sub"></div>';
+    el.querySelector('.stat-label').textContent = `${t(label)} · ${t('usageCalls', { n: s.calls })}`;
+    el.querySelector('.stat-value').textContent = fmt(s.in + s.out);
+    el.querySelector('.stat-sub').textContent = t('usageTokens', { in: fmt(s.in), out: fmt(s.out) });
+    return el;
+  }));
+  const month = periods[2][1];
+  const head = document.createElement('tr');
+  for (const k of ['usageKind', 'usageCallsCol', 'usageInCol', 'usageOutCol']) head.append(Object.assign(document.createElement('th'), { textContent: t(k) }));
+  const rows = Object.entries(month.kinds).sort((a, b) => (b[1].in + b[1].out) - (a[1].in + a[1].out)).map(([k, v]) => {
+    const tr = document.createElement('tr');
+    for (const val of [t(`kind_${k}`), fmt(v.calls), fmt(v.in), fmt(v.out)]) tr.append(Object.assign(document.createElement('td'), { textContent: val }));
+    return tr;
+  });
+  $('usageTable').replaceChildren(head, ...rows);
 }
 
 // ---------- learned ----------
@@ -261,6 +304,7 @@ async function renderLearned() {
 }
 chrome.storage.onChanged.addListener((changes, area) => {
   if (area === 'local' && (changes.learned || changes.groups)) renderLearned();
+  if (area === 'local' && changes.usage) renderUsage();
 });
 
 $('clearCache').addEventListener('click', async () => {
