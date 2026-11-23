@@ -55,7 +55,7 @@ export async function updateSession(key, fallback, fn) {
   return next;
 }
 
-/** Key used for learning and caching: host plus first path segment, e.g. "gitlab.example.com/fortinac". */
+/** Key used for learning and caching: host plus first path segment, e.g. "git.example.com/backend". */
 export function urlKey(url) {
   try {
     const u = new URL(url);

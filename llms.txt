@@ -1,0 +1,28 @@
+# Tabmason
+
+> Tabmason is a free, open-source Chrome extension (Manifest V3) that automatically sorts browser tabs into tab groups the user defines, marks tabs with colors and notes, shows a thumbnail overview of all open tabs, and saves snapshots of open windows every 10 minutes so they can be restored after a restart or crash. AI is optional and uses the user's own key for DeepSeek, Zhipu GLM, OpenAI or any OpenAI-compatible API. No account, no server, no tracking. Interface in English and Chinese.
+
+Key facts:
+
+- Category: Chrome extension, tab management, productivity.
+- Auto-sorting never creates groups the user didn't define. Order of decision: rules learned from the user's drags, user-written rules (host:/url:/title:), cached AI answers, then AI. Low-confidence AI answers become suggestions; every move can be undone.
+- AI sorting sends only tab titles, hosts and paths; page text is sent only when the user clicks "AI summary". Listed hosts are never sent.
+- Marks: a colored ring on the tab's favicon, optional colored dot in the title, optional note appended to the title so it appears in Chrome's tab hover card. Marks are stored per URL.
+- Overview page: Alt+Shift+O, thumbnails grouped like the tab strip, searchable by title, URL and note.
+- Snapshots: every 10 minutes (deduplicated, newest 24 kept) plus manual saves; restore rebuilds windows, groups (name, color, collapsed) and pinned tabs, loading background tabs lazily.
+- Token usage per day and per purpose is shown on the settings page.
+- Install: Chrome Web Store (coming soon) or load unpacked from source.
+
+## Docs
+
+- [README (English)](https://github.com/aiwatching/Tabmason/blob/main/README.md): features, install, FAQ, project layout
+- [README (中文)](https://github.com/aiwatching/Tabmason/blob/main/README.zh-CN.md): 中文说明
+- [Privacy policy](https://github.com/aiwatching/Tabmason/blob/main/PRIVACY.md): what is stored locally and what is sent to the AI provider
+- [Chrome Web Store kit](https://github.com/aiwatching/Tabmason/blob/main/STORE.md): listing text, permission justifications
+
+## Source
+
+- [manifest.json](https://github.com/aiwatching/Tabmason/blob/main/manifest.json): permissions and entry points
+- [src/auto/](https://github.com/aiwatching/Tabmason/tree/main/src/auto): auto-sorting engine and classifier
+- [src/sw/](https://github.com/aiwatching/Tabmason/tree/main/src/sw): marks, thumbnails, snapshots
+- [src/content/mark.js](https://github.com/aiwatching/Tabmason/blob/main/src/content/mark.js): content script that shows marks on tabs

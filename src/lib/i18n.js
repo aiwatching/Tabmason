@@ -148,10 +148,10 @@ const zh = {
   kind_classify: '自动归类', kind_plan: '生成分组', kind_summary: '页面概要', kind_test: '测试连接', kind_other: '其他',
   usageEmpty: '还没有 AI 调用记录。',
 
-  defaultPlan: `Agent (Stable)：AI 工具和 agent 平台，比如 Claude、ChatGPT、DeepSeek、GLM、Forge 控制台、本地 localhost 上的 agent 页面
-Processing：手上正在处理的事情，比如正在跟的 Mantis bug 单、正在 review 或修改的 GitLab MR、当前排查问题时打开的日志和文档
-Works：日常工作相关但不是当前紧急处理的，比如 GitLab 项目和代码、Jira、Confluence、公司内部系统和工具文档
-Pesonal：个人用途，比如 Gmail、YouTube、购物、新闻、社交网站`,
+  defaultPlan: `工作：日常工作，比如项目看板、代码仓库、文档和公司内部工具
+处理中：手上正在处理的事情，比如正在跟进的工单、正在评审的代码、排查问题时打开的日志
+学习：文章、教程、视频课程和技术文档
+个人：邮件、购物、视频、新闻和社交网站`,
 };
 
 const en = {
@@ -295,10 +295,10 @@ const en = {
   kind_classify: 'Auto-sort', kind_plan: 'Group planning', kind_summary: 'Page summary', kind_test: 'Connection test', kind_other: 'Other',
   usageEmpty: 'No AI calls recorded yet.',
 
-  defaultPlan: `Agent (Stable): AI tools and agent platforms, e.g. Claude, ChatGPT, DeepSeek, GLM, the Forge console, agent pages on localhost
-Processing: what I'm working on right now, e.g. Mantis bugs I'm on, GitLab MRs I'm reviewing or changing, logs and docs open for the current investigation
-Works: day-to-day work that isn't urgent, e.g. GitLab projects and code, Jira, Confluence, internal company systems and tool docs
-Pesonal: personal stuff, e.g. Gmail, YouTube, shopping, news, social sites`,
+  defaultPlan: `Work: day-to-day work, e.g. project boards, code repositories, docs and internal tools
+In progress: what I'm on right now, e.g. tickets I'm following, code I'm reviewing, logs open while debugging
+Learning: articles, tutorials, video courses and technical docs
+Personal: mail, shopping, videos, news and social sites`,
 };
 
 const DICTS = { zh, en };
