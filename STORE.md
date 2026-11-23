@@ -12,18 +12,39 @@ Bump `version` in `manifest.json` before every new upload; the store rejects a v
 
 ## 2. Store listing tab
 
+Layout as of late 2026 (checked against developer.chrome.com/docs/webstore and the live dashboard).
+
+**Product details**
+
 | Field | Value |
 |---|---|
-| Name | Tabmason (from the manifest) |
-| Summary | from the manifest `description` (≤ 132 chars) |
-| Category | Productivity → Workflow & Planning |
-| Language | English (default); add Chinese (Simplified) as a localized listing |
-| Store icon | `icons/icon128.png` (96 px artwork, 16 px transparent padding) |
-| Screenshots (1280×800) | `store/en/screenshot-1…4-*.png` (Chinese listing: `store/zh/…`) |
-| Small promo tile (440×280) | `store/<lang>/promo-small-440x280.png` |
-| Marquee (1400×560, optional) | `store/<lang>/promo-marquee-1400x560.png` |
+| Title from package / Summary from package | read-only: the manifest `name` and `description` |
+| Description* (max 16,000 chars) | paste "Detailed description (English)" below |
+| Category* | Workflow & Planning (under Productivity); if missing, Tools |
+| Language* | English |
+
+The listing is single-language until the package itself is internationalized (`default_locale` + `_locales/`); only then can you add a localized listing (localized description, screenshots and promo video). The Chinese texts below are ready for that.
+
+**Graphic assets**
+
+| Field | File |
+|---|---|
+| Store icon* (128×128 PNG) | `icons/icon128.png` |
+| Screenshots* (1–5, 1280×800) | `store/en/screenshot-1…4-*.png` |
+| Global promo video | leave empty |
+| Small promo tile (440×280) | `store/en/promo-small-440x280.png` |
+| Marquee promo tile (1400×560) | `store/en/promo-marquee-1400x560.png` (optional) |
+
+Promo tiles are global (not localizable).
+
+**Additional fields**
+
+| Field | Value |
+|---|---|
+| Official URL | skip (needs a site verified in Search Console) |
 | Homepage URL | https://github.com/aiwatching/Tabmason |
 | Support URL | https://github.com/aiwatching/Tabmason/issues |
+| Mature content | off |
 
 ### Detailed description (English)
 
@@ -93,13 +114,13 @@ AI 由你掌控
 支持中文和英文界面。
 ```
 
-## 3. Privacy tab
+## 3. Privacy practices tab
 
-**Single purpose**
+**Single purpose description**
 
 > Tabmason organizes the user's browser tabs: it sorts them into user-defined tab groups, lets the user mark tabs with colors and notes, shows an overview of open tabs, and saves/restores snapshots of open windows.
 
-**Permission justifications**
+**Permissions justification** (one field per manifest permission; `<all_urls>` is the host permission)
 
 | Permission | Justification |
 |---|---|
@@ -112,22 +133,32 @@ AI 由你掌控
 | `alarms` | Save a snapshot of open windows every 10 minutes. |
 | Host permission `<all_urls>` | Show the user's mark on any page's tab (favicon ring, title), capture thumbnails of pages the user views for the overview, fetch site icons, and reach the AI endpoint the user configures. Pages are not read or changed for any other purpose. |
 
-**Remote code:** No, I am not using remote code.
+**Remote Code:** "No, I am not using remote code."
 
-**Data usage** — check:
+**Data usage** — in the first group check:
 - **Web history** (tab titles and URLs are sent to the AI provider the user configures, for sorting)
 - **Website content** (page text is sent to that provider when the user asks for an AI summary)
 
-Certify all three: not sold to third parties; not used or transferred for purposes unrelated to the single purpose; not used to determine creditworthiness or for lending.
+In the second group certify all three: not sold to third parties; not used or transferred for purposes unrelated to the single purpose; not used to determine creditworthiness or for lending.
 
 **Privacy policy URL:** https://github.com/aiwatching/Tabmason/blob/main/PRIVACY.md
 
-## 4. Submit
+## 4. Distribution tab
 
-1. Register at https://chrome.google.com/webstore/devconsole (one-time USD 5 fee).
-2. **New item** → upload `dist/tabmason-<version>.zip`.
-3. Fill the Store listing and Privacy tabs from this file; Distribution: Public, all regions.
-4. **Submit for review.** Extensions with access to all sites usually get a longer, manual review (days rather than hours).
+- Visibility: **Public** (or Unlisted to test with a link first).
+- Regions: **All regions**.
+
+## 5. Test instructions tab
+
+Optional; leave empty (no login or paid account needed).
+
+## 6. Submit
+
+1. Register at https://chrome.google.com/webstore/devconsole (one-time fee) — the developer email can't be changed later.
+2. **Add new item** → **Choose file** → `dist/tabmason-<version>.zip` → **Upload**.
+3. Fill the tabs above, **Save draft**.
+4. **Submit for Review**; keep "publish automatically after review" checked. Reviews take days to weeks; broad host permissions like `<all_urls>` take longer. After approval you have 30 days to publish if you chose to publish manually.
+5. New publishers can have at most two published extensions until they request more.
 
 ## Regenerating graphics
 
